@@ -2,12 +2,15 @@ package yak
 
 import (
 	"bytes"
-	. "fmt"
+	"fmt"
 	"os"
 	R "reflect"
 )
 
 type Any interface{}
+
+var E = fmt.Errorf
+var F = fmt.Sprintf
 
 // Show objects as a string.
 func Show(aa ...Any) string {
@@ -15,32 +18,32 @@ func Show(aa ...Any) string {
 	for _, a := range aa {
 		switch x := a.(type) {
 		case string:
-			buf.WriteString(Sprintf("%q ", x))
+			buf.WriteString(F("%q ", x))
 		case []byte:
-			buf.WriteString(Sprintf("%q ", string(x)))
+			buf.WriteString(F("%q ", string(x)))
 		case int:
-			buf.WriteString(Sprintf("%d ", x))
+			buf.WriteString(F("%d ", x))
 		case int64:
-			buf.WriteString(Sprintf("%d ", x))
+			buf.WriteString(F("%d ", x))
 		case float32:
-			buf.WriteString(Sprintf("%f ", x))
-		case Stringer:
-			buf.WriteString(Sprintf("%s ", x))
+			buf.WriteString(F("%f ", x))
+		case fmt.Stringer:
+			buf.WriteString(F("%s ", x))
 		case error:
-			buf.WriteString(Sprintf("{error:%s} ", x))
+			buf.WriteString(F("{error:%s} ", x))
 		default:
 			v := R.ValueOf(a)
 			switch v.Kind() {
 			case R.Slice:
 				n := v.Len()
-				buf.WriteString(Sprintf("%d[ ", n))
+				buf.WriteString(F("%d[ ", n))
 				for i := 0; i < n; i++ {
 					buf.WriteString(Show(v.Index(i).Interface()))
 				}
 				buf.WriteString("] ")
 			case R.Map:
 				n := v.Len()
-				buf.WriteString(Sprintf("%d{ ", n))
+				buf.WriteString(F("%d{ ", n))
 				kk := v.MapKeys()
 				for _, k := range kk {
 					buf.WriteString(Show(k.Interface()))
@@ -50,7 +53,7 @@ func Show(aa ...Any) string {
 				}
 				buf.WriteString("} ")
 			default:
-				buf.WriteString(Sprintf("{%s:%s:%v} ", R.ValueOf(x).Kind(), R.ValueOf(x).Type(), x))
+				buf.WriteString(F("{%s:%s:%v} ", R.ValueOf(x).Kind(), R.ValueOf(x).Type(), x))
 			}
 		}
 	}
@@ -59,7 +62,12 @@ func Show(aa ...Any) string {
 
 // Say arguments on stderr.
 func Say(aa ...Any) {
-	Fprintf(os.Stderr, "## %s\n", Show(aa...))
+	fmt.Fprintf(os.Stderr, "## %s\n", Show(aa...))
+}
+
+// Bad calls Show on the argumetns, and panics that string.
+func Bad(aa ...Any) string {
+	panic(Show(aa))
 }
 
 // Ci is Check int error
