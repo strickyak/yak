@@ -3,6 +3,7 @@ package yak
 import (
 	"bytes"
 	"fmt"
+	"runtime/debug"
 	"os"
 	R "reflect"
 )
@@ -92,4 +93,37 @@ func Cs(x string, err error) string {
 		panic(err)
 	}
 	return x
+}
+
+func MustEq(a, b interface{}, info... interface{}) {
+	x := R.ValueOf(a)
+	y := R.ValueOf(b)
+	var ok bool
+
+	switch x.Kind() {
+	case R.Int:
+	case R.Int64:
+		ok = x.Int() == y.Int()
+	case R.Uint:
+	case R.Uint64:
+		ok = x.Uint() == y.Uint()
+	case R.String:
+		ok = x.String() == y.String()
+	}
+
+	if !ok {
+		Show("debug.PrintStack:")
+		debug.PrintStack()
+		Show("MustEq FAILS:  a, b, info...", a, b, info)
+		panic(Bad("MustEq FAILS (info=%v):   %v  !=  %v", info, a, b))
+	}
+}
+
+func Must(ok bool, info... interface{}) {
+	if !ok {
+		Show("debug.PrintStack:")
+		debug.PrintStack()
+		Show("MustEq FAILS:  info...", info)
+		panic(Bad("MustEq FAILS (info=%v)", info))
+	}
 }
