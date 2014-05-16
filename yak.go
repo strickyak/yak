@@ -8,13 +8,11 @@ import (
 	R "reflect"
 )
 
-type Any interface{}
-
 var E = fmt.Errorf
 var F = fmt.Sprintf
 
 // Show objects as a string.
-func Show(aa ...Any) string {
+func Show(aa ...interface{}) string {
 	buf := bytes.NewBuffer(nil)
 	for _, a := range aa {
 		switch x := a.(type) {
@@ -62,13 +60,18 @@ func Show(aa ...Any) string {
 }
 
 // Say arguments on stderr.
-func Say(aa ...Any) {
+func Say(aa ...interface{}) {
 	fmt.Fprintf(os.Stderr, "## %s\n", Show(aa...))
 }
 
 // Bad calls Show on the argumetns, and panics that string.
-func Bad(aa ...Any) string {
+func Bad(aa ...interface{}) string {
 	panic(Show(aa))
+}
+
+// Bad formats the argumetns, and panics that string.
+func Badf(s string, aa ...interface{}) string {
+	panic(fmt.Sprintf(s, aa...))
 }
 
 // Ci is Check int error
