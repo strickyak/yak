@@ -3,9 +3,9 @@ package yak
 import (
 	"bytes"
 	"fmt"
-	"runtime/debug"
 	"os"
 	R "reflect"
+	"runtime/debug"
 )
 
 var E = fmt.Errorf
@@ -17,17 +17,17 @@ func Show(aa ...interface{}) string {
 	for _, a := range aa {
 		switch x := a.(type) {
 		case string:
-			buf.WriteString(F("%q ", x))
+			buf.WriteString(F("string %q ", x))
 		case []byte:
-			buf.WriteString(F("%q ", string(x)))
+			buf.WriteString(F("[]byte [%d] %q ", len(x), string(x)))
 		case int:
-			buf.WriteString(F("%d ", x))
+			buf.WriteString(F("int %d ", x))
 		case int64:
-			buf.WriteString(F("%d ", x))
+			buf.WriteString(F("int64 %d ", x))
 		case float32:
-			buf.WriteString(F("%f ", x))
+			buf.WriteString(F("float32 %f ", x))
 		case fmt.Stringer:
-			buf.WriteString(F("%s ", x))
+			buf.WriteString(F("Stringer %T %q ", a, x))
 		case error:
 			buf.WriteString(F("{error:%s} ", x))
 		default:
@@ -52,7 +52,8 @@ func Show(aa ...interface{}) string {
 				}
 				buf.WriteString("} ")
 			default:
-				buf.WriteString(F("{%s:%s:%v} ", R.ValueOf(x).Kind(), R.ValueOf(x).Type(), x))
+				buf.WriteString(F("WUT{%#v} ", x))
+				// buf.WriteString(F("{%s:%s:%v} ", R.ValueOf(x).Kind(), R.ValueOf(x).Type(), x))
 			}
 		}
 	}
@@ -98,7 +99,7 @@ func Cs(x string, err error) string {
 	return x
 }
 
-func MustEq(a, b interface{}, info... interface{}) {
+func MustEq(a, b interface{}, info ...interface{}) {
 	x := R.ValueOf(a)
 	y := R.ValueOf(b)
 	var ok bool
@@ -122,7 +123,7 @@ func MustEq(a, b interface{}, info... interface{}) {
 	}
 }
 
-func Must(ok bool, info... interface{}) {
+func Must(ok bool, info ...interface{}) {
 	if !ok {
 		Show("debug.PrintStack:")
 		debug.PrintStack()
