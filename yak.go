@@ -91,6 +91,14 @@ func CI(x int64, err error) int64 {
 	return x
 }
 
+// CF is Check float64 error
+func CF(x float64, err error) float64 {
+	if err != nil {
+		panic(err)
+	}
+	return x
+}
+
 // Cs is Check string error
 func Cs(x string, err error) string {
 	if err != nil {
