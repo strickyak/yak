@@ -38,6 +38,7 @@ func Show(aa ...interface{}) string {
 				buf.WriteString(F("%d[ ", n))
 				for i := 0; i < n; i++ {
 					buf.WriteString(Show(v.Index(i).Interface()))
+					buf.WriteString(" , ")
 				}
 				buf.WriteString("] ")
 			case R.Map:
@@ -53,7 +54,6 @@ func Show(aa ...interface{}) string {
 				buf.WriteString("} ")
 			default:
 				buf.WriteString(F("WUT{%#v} ", x))
-				// buf.WriteString(F("{%s:%s:%v} ", R.ValueOf(x).Kind(), R.ValueOf(x).Type(), x))
 			}
 		}
 	}
@@ -62,7 +62,13 @@ func Show(aa ...interface{}) string {
 
 // Say arguments on stderr.
 func Say(aa ...interface{}) {
-	fmt.Fprintf(os.Stderr, "## %s\n", Show(aa...))
+	buf := bytes.NewBuffer([]byte("## "))
+	for _, a := range aa {
+		buf.WriteString(Show(a))
+		buf.WriteString(" ; ")
+	}
+
+	fmt.Fprintf(os.Stderr, "## %s\n", buf)
 }
 
 // Bad calls Show on the argumetns, and panics that string.
